@@ -12,6 +12,9 @@ tmp1 = reshape(tmp, vec_num, vec_len);
 % in this simple for visualization example we set vector length equal to 2
 data = tmp1(:, 1:2);
 vec_len = 2;
+% cutting some data off to speed up calculations in testing example 
+vec_num = 5000;
+data = data(1:vec_num, :);
 %data = [rand(vec_num, 1) rand(vec_num, 1)];
 
 %figure;
@@ -19,12 +22,12 @@ vec_len = 2;
 
 
 eps = 0.1; % we here just presume some 'small' number, it's small size is defined by comparison with full range of input numbers
-CV_NUM = 4; % we here take presume some number of resulting code vectors
+CV_NUM = 8; % we here take presume some number of resulting code vectors as a power of 2
 
 %% algorithm initialization stage ...
 
-C = mean(data);
-D = calc_dist_measure(C, data);
+C_init = mean(data);
+D_init = calc_dist_measure(C_init, data);
 
 % figure;
 % hold on;
@@ -33,15 +36,16 @@ D = calc_dist_measure(C, data);
 
 %% actual iterative algorithm
 Q = cell(1, CV_NUM);
-for code_num = 1 : CV_NUM
-    N = 1;
+N = 1;
+C_cur = cell(1, N);
+C_cur{1} = C_init; % this one will later become a cell array whos' length grows by factor of 2 on each iteration...
+D_cur = D_init;
+for code_num = 1 : CV_NUM/2
     Ci = cell(1, N*2);
 
     for i = 1 : N
-        Ci{i} = (1 + eps)*C
-        Ci{N+i} = (1 - eps)*C
-        i
-        N+i
+        Ci{i} = (1 + eps)*C_cur{i};
+        Ci{N+i} = (1 - eps)*C_cur{i};
     end
 
 %     figure;
@@ -56,19 +60,85 @@ for code_num = 1 : CV_NUM
     N = N*2;
     
     iter_num = 0;
-    Dmin_arr = zeros(1, N);
-    for n = 1 : N
-        Dmin_arr(n) = min(distance(Ci{n}, data));
+    DO = 1;
+    D_tmp = D_cur;
+    while (DO)
+        % DBG
+        fprintf('Working on code %d ... iter_num = %d ... D_tmp = %f ...\n', code_num, iter_num, D_tmp);
+        
+        Dmin_arr = zeros(1, N);
+        for n = 1 : N
+            Dmin_arr(n) = min(distance(Ci{n}, data));
+        end
+
+        [Dmin, n_min] = min(Dmin_arr);
+        Q{code_num} = Ci{n_min};
+
+        Ci1 = cell(1, N);
+        for n = 1:N
+            tmp_sum = zeros(1, vec_len);
+            tmp_num = 0;
+            for m = 1: vec_num
+                [~, code_idx] = select_code_for_input(Ci, data(m,:));
+                if (code_idx == n)
+                    tmp_sum = tmp_sum + data(m,:);
+                    tmp_num = tmp_num + 1;
+                end
+            end
+            Ci1{n} = tmp_sum ./ tmp_num;
+        end
+
+        %Ci
+        %Ci1
+        
+        iter_num = iter_num + 1;
+        Davg(iter_num) = calc_dist_measure_by_codes(Ci1, data);
+    
+        %D_cur
+        %Davg(iter_num)
+        
+        DD = D_tmp - Davg(iter_num);
+        
+        %DBG
+        if ( DD < 0)
+            error('Oooops ... STRANGE! DD is supposed to be positive ... ');
+        end
+        
+        if ((DD / D_tmp) < eps)
+            DO = 0; %end of current iteration ...
+        end
+        
+        D_tmp = Davg(iter_num);
+        Ci = Ci1;
+        
+        %DBG
+        fprintf('Results of iteration: DD/D_tmp = %f ...\n', DD/D_tmp);
+    end % of while(DO)
+    
+    % DBG
+    if (code_num >= 200)
+        figure;
+        hold on;
+        plot(data(:,1), data(:,2), '.');
+        for i = 1:N/2
+            plot(C_cur{i}(1), C_cur{i}(2), 'r*');
+        end
+        for i = 1:N
+            plot(Ci{i}(1), Ci{i}(2), '*m');
+            %plot(Ci{N+i}(1), Ci{N+i}(2), '*m');
+        end
+        return;
     end
     
-    [Dmin, n_min] = min(Dmin_arr);
-    Q{code_num} = Ci{n_min};
-    
-%     figure;
-%     hold on;
-%     plot(data(:,1), data(:,2), '.');
-%     plot(C(1), C(2), 'r*');
-%     plot(Q{code_num}(1), Q{code_num}(2), '*g');
-    
-    return;
+    D_cur = Davg(iter_num);
+    C_cur = Ci;
 end % of 1 : CV_NUM
+
+% plotting final algorithm result
+figure;
+hold on;
+plot(data(:,1), data(:,2), '.k');
+for i = 1:CV_NUM
+    plot(C_cur{i}(1), C_cur{i}(2), 'r*');
+end
+return;
