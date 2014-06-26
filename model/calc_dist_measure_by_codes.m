@@ -10,7 +10,7 @@ D = 0;
 for k = 1 : M
     Xk = data(k,:);
     Ck = select_code_for_input(centers, Xk);
-    Dk = distance(Ck, Xk);
+    Dk = distance(Ck, Xk, 1);
     D = D + Dk;
 end
 

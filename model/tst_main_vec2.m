@@ -27,7 +27,7 @@ CV_NUM = 8; % we here take presume some number of resulting code vectors as a po
 %% algorithm initialization stage ...
 
 C_init = mean(data);
-D_init = calc_dist_measure(C_init, data);
+D_init = calc_dist_measure(C_init, data, vec_num);
 
 % figure;
 % hold on;
@@ -68,24 +68,25 @@ for code_num = 1 : CV_NUM/2
         
         Dmin_arr = zeros(1, N);
         for n = 1 : N
-            Dmin_arr(n) = min(distance(Ci{n}, data));
+            Dmin_arr(n) = min(distance(Ci{n}, data, vec_num));
         end
 
         [Dmin, n_min] = min(Dmin_arr);
         Q{code_num} = Ci{n_min};
-
+       
         Ci1 = cell(1, N);
+        tmp_sum = cell(1, N);
+        tmp_num = zeros(1,N);
         for n = 1:N
-            tmp_sum = zeros(1, vec_len);
-            tmp_num = 0;
-            for m = 1: vec_num
-                [~, code_idx] = select_code_for_input(Ci, data(m,:));
-                if (code_idx == n)
-                    tmp_sum = tmp_sum + data(m,:);
-                    tmp_num = tmp_num + 1;
-                end
-            end
-            Ci1{n} = tmp_sum ./ tmp_num;
+            tmp_sum{n} = zeros(1, vec_len);;
+        end
+        for m = 1: vec_num
+            [~, code_idx] = select_code_for_input(Ci, data(m,:));
+            tmp_sum{code_idx} = tmp_sum{code_idx} + data(m,:);
+            tmp_num(code_idx) = tmp_num(code_idx) + 1;
+        end
+        for n = 1:N
+                    Ci1{n} = tmp_sum{n} ./ tmp_num(n);
         end
 
         %Ci
