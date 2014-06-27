@@ -14,7 +14,8 @@ vec_len = 13; % given by default
 
 
 vec_num = length(tmp) / vec_len;
-tmp1 = reshape(tmp, vec_num, vec_len);
+tmp1 = reshape(tmp, vec_len, vec_num);
+tmp1 = tmp1';
 
 % in this simple for visualization example we set vector length equal to 2
 data = tmp1(:, 1:2);
@@ -144,7 +145,7 @@ end % of 1 : CV_NUM
 % plotting final algorithm result
 figure;
 hold on;
-plot(data(:,1), data(:,2), '.k');
+plot(data(:,1), data(:,2), '.c');
 for i = 1:CV_NUM
     plot(C_cur{i}(1), C_cur{i}(2), 'r*');
 end

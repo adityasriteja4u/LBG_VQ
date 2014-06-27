@@ -113,10 +113,10 @@ template<typename T, size_t sz> class MyVector;
 //template<typename T> using Vec3 = MyVector<T, 3>;
 //template<typename T> using Vec4 = MyVector<T, 4>;
 
-template<typename T, size_t size> class MyVector
+template<typename T, size_t vec_size> class MyVector
 {
 public:
-	static const size_t size = size;
+	static const size_t size = vec_size;
 private:
 	std::vector<T> coords;
 	T len;
@@ -173,7 +173,7 @@ available for MyVector<size=4>");
 		coords[3] = u;
 		len = vector_length<T, size>(coords);
 	}
-	MyVector(const T* inp_data) : coords(inp_data[0], inp_data[size])
+	MyVector(const T* inp_data) : coords(&inp_data[0], &inp_data[vec_size])
 	{
 		len = vector_length<T, size>(coords);
 	}
@@ -255,10 +255,10 @@ available for MyVector<size=4>");
 		return vector_dot_product<T, size>(coords, inp.data());
 	}
 
-	template<size_t inp_size> MyVector<T, 3> cross(const MyVector<T, inp_size>& inp)
-	{
-		return Vec3<T>( vector_cross_product<T, size, inp_size> (coords, inp.data()) );
-	}
+	// template<size_t inp_size> MyVector<T, 3> cross(const MyVector<T, inp_size>& inp)
+	// {
+		// return Vec3<T>( vector_cross_product<T, size, inp_size> (coords, inp.data()) );
+	// }
 };
 
 /*

@@ -5,9 +5,15 @@
 
 #include "basic_tests.h"
 
-int main(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	basic_my_vector_tst();
+
+        basic_bit_set_tst();
+
+        basic_file_io_tst();
+
+        basic_data_set_constructor_tst();
 
 	printf("All done, press enter to exit ...");
 	getchar();
