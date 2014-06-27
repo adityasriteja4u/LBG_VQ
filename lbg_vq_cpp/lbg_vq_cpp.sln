@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lbg_vq_cpp", "lbg_vq_cpp\lbg_vq_cpp.vcproj", "{E69D02E4-543B-4E8D-9CCC-2273543EB0FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E69D02E4-543B-4E8D-9CCC-2273543EB0FB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E69D02E4-543B-4E8D-9CCC-2273543EB0FB}.Debug|Win32.Build.0 = Debug|Win32
+		{E69D02E4-543B-4E8D-9CCC-2273543EB0FB}.Release|Win32.ActiveCfg = Release|Win32
+		{E69D02E4-543B-4E8D-9CCC-2273543EB0FB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

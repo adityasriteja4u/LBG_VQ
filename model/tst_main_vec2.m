@@ -5,7 +5,14 @@ F = fopen('../base.dat','rb');
 tmp = fread(F, inf, 'float');
 fclose(F);
 
+% THESE ARE THE MAIN INPUT PARAMETERS OF THE ALGORITHM
+eps = 0.1; % we here just presume some 'small' number, it's small size is defined by comparison with full range of input numbers
+CV_NUM = 8; % we here take presume some number of resulting code vectors as a power of 2
 vec_len = 13; % given by default
+
+
+
+
 vec_num = length(tmp) / vec_len;
 tmp1 = reshape(tmp, vec_num, vec_len);
 
@@ -21,8 +28,7 @@ data = data(1:vec_num, :);
 %plot(data(:,1), data(:,2), '.');
 
 
-eps = 0.1; % we here just presume some 'small' number, it's small size is defined by comparison with full range of input numbers
-CV_NUM = 8; % we here take presume some number of resulting code vectors as a power of 2
+
 
 %% algorithm initialization stage ...
 
