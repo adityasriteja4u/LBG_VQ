@@ -22,7 +22,7 @@ mean_dists = zeros(1, length(cb_lens));
 max_dists = zeros(1, length(cb_lens));
 for k = 1: length(cb_lens)
     cur_cb_len = cb_lens(k);
-    decoded = get_decoded_data_vector_from_file('../../lbg_vq_cpp/Release', 'decoded', 'dec', cur_cb_len, epsilon, VEC_LEN);
+    decoded = get_decoded_data_vector_from_file('./', 'decoded', 'dec', cur_cb_len, epsilon, VEC_LEN);
     
     for m = 1 : VEC_NUM
         dists(m) = sqrt(sum((orig_data(m,:) - decoded(m,:)).^2));
@@ -35,13 +35,13 @@ end
 %% visualization
 
 figure;
-stem( cb_lens, mean_dists, 'r*');
+plot( cb_lens, mean_dists);
 legend('Mean norms');
 xlabel('code book length');
 ylabel('mean norm');
 
 figure;
-stem( cb_lens, max_dists, 'r*');
+plot( cb_lens, max_dists);
 legend('Max norms');
 xlabel('code book length');
 ylabel('max norm');
