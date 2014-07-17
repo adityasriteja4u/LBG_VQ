@@ -188,7 +188,7 @@ public:
 					}
 					
 					mean_dist_tmp = CalcMeanDistanceByCodeBook<T, vec_len> (training_set, *center_i1);
-					if ((mean_dist_cur - mean_dist_tmp)/mean_dist_tmp < epsilon)
+					if ((mean_dist_cur - mean_dist_tmp)/mean_dist_cur < epsilon)
 						DO = false;
 
 					mean_dist_cur = mean_dist_tmp;
@@ -231,9 +231,12 @@ template<typename T, size_t vec_len> T
         CalcMeanDistance(const std::vector< MyVector<T, vec_len> >& data, MyVector<T, vec_len> X)
 {
         T result = T(0);
-
-        for (unsigned int n = 0; n < data.size(); ++n)
-                result += (X - data[n]).length();
+		T tmp = T(0);
+		for (unsigned int n = 0; n < data.size(); ++n){
+				tmp = (X - data[n]).sq_length();
+				//tmp *= tmp;
+                result += tmp;
+		}
 
         result /= ((T)data.size()* (T)vec_len);
         return result;
@@ -244,11 +247,12 @@ template<typename T, size_t vec_len> T
                                         const LbgCodeBook<T, vec_len>& book)
 {
         T result(0);
-
-		
+		T tmp(0);
         for (unsigned int n = 0; n < data.size(); ++n) {
-			const LbgCode<T, vec_len> &tmp = book.SelectCodeForInput(data[n], 0);
-            result += (tmp.Values() - data[n]).length();
+			const LbgCode<T, vec_len> &tmp1 = book.SelectCodeForInput(data[n], 0);
+			tmp = (tmp1.Values() - data[n]).sq_length();
+			//tmp *= tmp;
+            result += tmp;
         }
 
         result /= ((float)data.size()* (float)vec_len);

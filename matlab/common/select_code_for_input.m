@@ -3,7 +3,7 @@ function [C, cidx] = select_code_for_input(codes, x)
 
     D = zeros(1, length(codes));
     for n = 1 : length(codes)
-        D(n) = distance(codes{n}, x, 1);
+        D(n) = distance_my(codes{n}, x, 1);
     end
 
     [~, cidx] = min(D);

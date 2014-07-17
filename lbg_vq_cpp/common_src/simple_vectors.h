@@ -16,6 +16,14 @@ template<typename T, size_t sz> T vector_length(std::vector<T> inp)
 	return result;
 }
 
+template<typename T, size_t sz> T vector_sq_length(std::vector<T> inp)
+{
+	T result(0);
+	for (size_t k = 0; k < sz; ++k)
+		result += inp[k] * inp[k];
+	return result;
+}
+
 template<typename T, size_t sz> std::vector<T> vector_add(const std::vector<T>& inp1,
 		const std::vector<T>& inp2)
 {
@@ -107,7 +115,7 @@ template<typename T, size_t sz> T vector_dot_product(const std::vector<T>& inp1,
 //	return result;
 //}
 
-template<typename T, size_t sz> class MyVector;
+//template<typename T, size_t sz> class MyVector;
 
 //template<typename T> using Vec2 = MyVector<T, 2>;
 //template<typename T> using Vec3 = MyVector<T, 3>;
@@ -119,14 +127,16 @@ public:
 	static const size_t size = vec_size;
 private:
 	std::vector<T> coords;
-	T len;
+	//T len;
+	T sq_len;
 public:
 	typedef T data_type;
 	T X() const { return coords[0]; }
 	T Y() const { if (size < 2) return T(0); else return coords[1]; }
 	T Z() const { if (size < 3) return T(0); else return coords[2]; }
 	T U() const { if (size < 4) return T(0); else return coords[3]; }
-	T length() const { return len; };
+	T length() const { return sqrt(sq_len); };
+	T sq_length() const { return sq_len; }
 	const std::vector<T>& data() const { return coords; }
 #ifdef DBG_SIMPLE_VECTORS
 	void TRACE() const
@@ -141,7 +151,8 @@ public:
 	{
 		for (size_t k = 0; k < size; ++k)
 			coords[k] = T(0);
-		len = T(0);
+		//len = T(0);
+		sq_len = T(0);
 	}
 	MyVector(T x, T y): coords(size)
 	{
@@ -150,7 +161,8 @@ public:
 for MyVector<size=2>");
 		coords[0] = x;
 		coords[1] = y;
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);//vector_length<T, size>(coords);
 	}
 	MyVector(T x, T y, T z):coords(size)
 	{
@@ -160,7 +172,8 @@ available for MyVector<size=3>");
 		coords[0] = x;
 		coords[1] = y;
 		coords[2] = z;
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);;
 	}
 	MyVector(T x, T y, T z, T u):coords(size)
 	{
@@ -171,15 +184,18 @@ available for MyVector<size=4>");
 		coords[1] = y;
 		coords[2] = z;
 		coords[3] = u;
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);;
 	}
 	MyVector(const T* inp_data) : coords(&inp_data[0], &inp_data[vec_size])
 	{
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);
 	}
 	MyVector(const std::vector<T>& inp_data) : coords(inp_data)
 	{
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);
 	}
 
 	const T operator[](size_t idx) const
@@ -198,7 +214,8 @@ available for MyVector<size=4>");
 	{
 		for (size_t k = 0; k < size; ++k)
 			coords[k] /= len;
-		len = vector_length<T, size> (coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);
 		return *this;
 	}
 	MyVector<T, size> operator+(const MyVector<T, size>& inp) const
@@ -213,14 +230,16 @@ available for MyVector<size=4>");
 	MyVector<T, size>& operator+=(const MyVector<T, size>& inp)
 	{
 		vector_inplace_add<T, size>(coords, inp.data());
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);
 		return *this;
 	}
 	/* WARNING! Reference is returned! Use with extra-care! */
 	MyVector<T, size>& operator-=(const MyVector<T, size>& inp)
 	{
 		vector_inplace_sub<T, size>(coords, inp.data());
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);
 		return *this;
 	}
 
@@ -233,7 +252,8 @@ available for MyVector<size=4>");
 	MyVector<T, size>& operator*=(const T inp)
 	{
 		vector_mult_by_scalar_inplace<T, size>(coords, inp);
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);
 		return *this;
 	}
 
@@ -246,7 +266,8 @@ available for MyVector<size=4>");
 	MyVector<T, size>& operator/=(const T inp)
 	{
 		vector_mult_by_scalar_inplace<T, size>(coords, 1/inp);
-		len = vector_length<T, size>(coords);
+		sq_len = vector_sq_length<T, size>(coords);
+		//len = sqrt(sq_len);
 		return *this;
 	}
 
@@ -259,6 +280,175 @@ available for MyVector<size=4>");
 	{
 		for (size_t k = 0; k < size; ++k)
 			coords[k] = T(0);
+		sq_len = T(0);
+		//len = T(0);
+	}
+	// template<size_t inp_size> MyVector<T, 3> cross(const MyVector<T, inp_size>& inp)
+	// {
+		// return Vec3<T>( vector_cross_product<T, size, inp_size> (coords, inp.data()) );
+	// }
+};
+
+template<typename T, size_t vec_size> class MyVectorFull
+{
+public:
+	static const size_t size = vec_size;
+private:
+	std::vector<T> coords;
+	T len;
+	T sq_len;
+public:
+	typedef T data_type;
+	T X() const { return coords[0]; }
+	T Y() const { if (size < 2) return T(0); else return coords[1]; }
+	T Z() const { if (size < 3) return T(0); else return coords[2]; }
+	T U() const { if (size < 4) return T(0); else return coords[3]; }
+	T length() const { return len; };
+	T sq_length() const { return sq_len; }
+	const std::vector<T>& data() const { return coords; }
+#ifdef DBG_SIMPLE_VECTORS
+	void TRACE() const
+	{
+		std::cout << "TRACING VECTOR " << this << ", size=" << size << ": X=" << this->X() << ", Y="
+			<< this->Y() << ", Z=" << this->Z() << ", U=" << this->U() << ", LEN=" << len << std::endl;
+	}
+#endif
+	
+	/* constructors ... */
+	MyVectorFull(): coords(size)
+	{
+		for (size_t k = 0; k < size; ++k)
+			coords[k] = T(0);
+		len = T(0);
+		sq_len = T(0);
+	}
+	MyVectorFull(T x, T y): coords(size)
+	{
+		if (size != 2)
+			throw new std::runtime_error("ERROR in MyVector : MyVector(x,y) constructor is only available \
+for MyVector<size=2>");
+		coords[0] = x;
+		coords[1] = y;
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);//vector_length<T, size>(coords);
+	}
+	MyVectorFull(T x, T y, T z):coords(size)
+	{
+		if (size != 3)
+			throw new std::runtime_error("ERROR in MyVector : MyVector(x,y,z) constructor is only \
+available for MyVector<size=3>");
+		coords[0] = x;
+		coords[1] = y;
+		coords[2] = z;
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);;
+	}
+	MyVectorFull(T x, T y, T z, T u):coords(size)
+	{
+		if (size != 4)
+			throw new std::runtime_error("ERROR in MyVector : MyVector(x,y,z,u) constructor is only \
+available for MyVector<size=4>");
+		coords[0] = x;
+		coords[1] = y;
+		coords[2] = z;
+		coords[3] = u;
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);;
+	}
+	MyVectorFull(const T* inp_data) : coords(&inp_data[0], &inp_data[vec_size])
+	{
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);
+	}
+	MyVectorFull(const std::vector<T>& inp_data) : coords(inp_data)
+	{
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);
+	}
+
+	const T operator[](size_t idx) const
+	{
+		if (idx < size)
+			return coords[idx];
+		else
+			throw new std::runtime_error("ERROR: In MyVector[] - index out of bound!!!");
+	}
+	MyVectorFull<T, size> operator-() const
+	{
+		return MyVectorFull<T, size> (vector_inverse<T, size> (coords));
+	}
+	/* WARNING! Reference is returned! Use with extra-care! */
+	MyVectorFull<T, size>& normalize()
+	{
+		for (size_t k = 0; k < size; ++k)
+			coords[k] /= len;
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);
+		return *this;
+	}
+	MyVectorFull<T, size> operator+(const MyVector<T, size>& inp) const
+	{
+		return MyVectorFull<T, size> ( vector_add<T, size> (coords, inp.data()) );
+	}
+	MyVectorFull<T, size> operator-(const MyVector<T, size>& inp) const
+	{
+		return MyVectorFull<T, size> ( vector_sub<T, size> (coords, inp.data()) );
+	}
+	/* WARNING! Reference is returned! Use with extra-care! */
+	MyVectorFull<T, size>& operator+=(const MyVector<T, size>& inp)
+	{
+		vector_inplace_add<T, size>(coords, inp.data());
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);
+		return *this;
+	}
+	/* WARNING! Reference is returned! Use with extra-care! */
+	MyVectorFull<T, size>& operator-=(const MyVector<T, size>& inp)
+	{
+		vector_inplace_sub<T, size>(coords, inp.data());
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);
+		return *this;
+	}
+
+	MyVectorFull<T, size> operator*(const T inp) const
+	{
+		return MyVectorFull<T, size> ( vector_mult_by_scalar<T, size>(coords, inp) );
+	}
+
+	/* WARNING! Reference is returned! Use with extra-care! */
+	MyVectorFull<T, size>& operator*=(const T inp)
+	{
+		vector_mult_by_scalar_inplace<T, size>(coords, inp);
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);
+		return *this;
+	}
+
+	MyVectorFull<T, size> operator/(const T inp) const
+	{
+		return (*this)*(1 / inp);
+	}
+
+	/* WARNING! Reference is returned! Use with extra-care! */
+	MyVectorFull<T, size>& operator/=(const T inp)
+	{
+		vector_mult_by_scalar_inplace<T, size>(coords, 1/inp);
+		sq_len = vector_sq_length<T, size>(coords);
+		len = sqrt(sq_len);
+		return *this;
+	}
+
+	T dot(const MyVectorFull<T, size>& inp)
+	{
+		return vector_dot_product<T, size>(coords, inp.data());
+	}
+
+	void clear()
+	{
+		for (size_t k = 0; k < size; ++k)
+			coords[k] = T(0);
+		sq_len = T(0);
 		len = T(0);
 	}
 	// template<size_t inp_size> MyVector<T, 3> cross(const MyVector<T, inp_size>& inp)

@@ -9,7 +9,7 @@ fclose(F);
 
 % THESE ARE THE MAIN INPUT PARAMETERS OF THE ALGORITHM
 eps = 0.1; % we here just presume some 'small' number, it's small size is defined by comparison with full range of input numbers
-CV_NUM = 8; % we here take presume some number of resulting code vectors as a power of 2
+CV_NUM = 128; % we here presume some number of resulting code vectors as a power of 2
 vec_len = 13; % given by default
 
 
@@ -25,6 +25,8 @@ data = tmp1(:, 1:vec_len);
 
 C_init = mean(data);
 D_init = calc_dist_measure(C_init, data, vec_num);
+
+tmp = sum(var(data))/vec_len;
 
 % figure;
 % hold on;
@@ -60,18 +62,11 @@ for code_num = 1 : NUM_STEPS
     iter_num = 0;
     DO = 1;
     D_tmp = D_cur;
+    D_final(code_num) = D_cur;
     while (DO)
         % DBG
-        fprintf('Working on code %d ... iter_num = %d ... D_tmp = %f ...\n', code_num, iter_num, D_tmp);
-        
-        %Dmin_arr = zeros(1, N);
-        %for n = 1 : N
-        %    Dmin_arr(n) = min(distance(Ci{n}, data, vec_num));
-        %end
-
-        %[Dmin, n_min] = min(Dmin_arr);
-        %Q{code_num} = Ci{n_min};
-       
+        fprintf('Working on code %d ... iter_num = %d ... D_cur = %f ...\n', code_num, iter_num, D_tmp);
+              
         Ci1 = cell(1, N);
         tmp_sum = cell(1, N);
         tmp_num = zeros(1,N);
@@ -103,7 +98,7 @@ for code_num = 1 : NUM_STEPS
             error('Oooops ... STRANGE! DD is supposed to be positive ... ');
         end
         
-        if ((DD / D_tmp) < eps)
+        if ((DD / D_cur) <= eps)
             DO = 0; %end of current iteration ...
         end
         
@@ -144,6 +139,10 @@ end
 for i = 1: CV_NUM
     C_cur{i}
 end
+
+figure;
+hold on;
+plot(D_final);
 
 rmpath('../common');
 return;

@@ -4,12 +4,7 @@ function D = calc_dist_measure(center, data, data_len)
 N = length(center); 
 M = data_len;
 
-% Dsum = 0;
-% for i = 1 : M
-%     Dc = distance(center, data(M,:));
-%     Dsum = Dsum + Dc;
-% end
-Dc = distance(center, data, data_len);
+Dc = distance_my(center, data, data_len);
 Dsum = sum(Dc);
 
 D = Dsum / (N*M);

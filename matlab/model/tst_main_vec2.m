@@ -8,30 +8,24 @@ tmp = fread(F, inf, 'float');
 fclose(F);
 
 % THESE ARE THE MAIN INPUT PARAMETERS OF THE ALGORITHM
-eps = 0.1; % we here just presume some 'small' number, it's small size is defined by comparison with full range of input numbers
-CV_NUM = 10; % we here take presume some number of resulting code vectors as a power of 2
+eps = 0.01; % we here just presume some 'small' number, it's small size is defined by comparison with full range of input numbers
+CV_NUM = 512; % we here take presume some number of resulting code vectors as a power of 2
 vec_len = 13; % given by default
-
-
-
 
 vec_num = length(tmp) / vec_len;
 tmp1 = reshape(tmp, vec_len, vec_num);
 tmp1 = tmp1';
-data = tmp1(:, 1:vec_len);
 
 % in this simple for visualization example we set vector length equal to 2
-data = tmp1(:, 1:2);
 vec_len = 2;
-% cutting some data off to speed up calculations in testing example 
 vec_num = 5000;
+
+% cutting some data off to speed up calculations in testing example 
+data = tmp1(:, 1:vec_len);
 data = data(1:vec_num, :);
-%data = [rand(vec_num, 1) rand(vec_num, 1)];
 
 %figure;
 %plot(data(:,1), data(:,2), '.');
-
-
 
 
 %% algorithm initialization stage ...
@@ -39,18 +33,21 @@ data = data(1:vec_num, :);
 C_init = mean(data);
 D_init = calc_dist_measure(C_init, data, vec_num);
 
+D_final_init = sqrt(D_init * vec_len);
+
 % figure;
 % hold on;
 % plot(data(:,1), data(:,2), '.');
 % plot(C(1), C(2), 'r*');
 
 %% actual iterative algorithm
+NUM_STEPS = ceil(log2(CV_NUM));
 Q = cell(1, CV_NUM);
 N = 1;
 C_cur = cell(1, N);
 C_cur{1} = C_init; % this one will later become a cell array whos' length grows by factor of 2 on each iteration...
 D_cur = D_init;
-for code_num = 1 : CV_NUM/2
+for code_num = 1 : NUM_STEPS
     Ci = cell(1, N*2);
 
     for i = 1 : N
@@ -72,18 +69,12 @@ for code_num = 1 : CV_NUM/2
     iter_num = 0;
     DO = 1;
     D_tmp = D_cur;
+    D_final(code_num) = D_cur;
+    D_final1(code_num) = D_final_init * (1-eps)^(log2(N));
     while (DO)
         % DBG
-        fprintf('Working on code %d ... iter_num = %d ... D_tmp = %f ...\n', code_num, iter_num, D_tmp);
-        
-        %Dmin_arr = zeros(1, N);
-        %for n = 1 : N
-        %    Dmin_arr(n) = min(distance(Ci{n}, data, vec_num));
-        %end
-
-        %[Dmin, n_min] = min(Dmin_arr);
-        %Q{code_num} = Ci{n_min};
-       
+        fprintf('Working on code %d ... iter_num = %d ... D_cur = %f ...\n', code_num, iter_num, D_tmp);
+              
         Ci1 = cell(1, N);
         tmp_sum = cell(1, N);
         tmp_num = zeros(1,N);
@@ -115,7 +106,7 @@ for code_num = 1 : CV_NUM/2
             error('Oooops ... STRANGE! DD is supposed to be positive ... ');
         end
         
-        if ((DD / D_tmp) < eps)
+        if ((DD / D_cur) <= eps)
             DO = 0; %end of current iteration ...
         end
         
@@ -152,6 +143,13 @@ plot(data(:,1), data(:,2), '.c');
 for i = 1:CV_NUM
     plot(C_cur{i}(1), C_cur{i}(2), 'r*');
 end
+
+figure;
+hold on;
+plot(sqrt(D_final*13));
+plot(D_final1,'r');
+str = sprintf('EPSILON = %1.2f', eps);
+title(str);
 
 rmpath('../common');
 

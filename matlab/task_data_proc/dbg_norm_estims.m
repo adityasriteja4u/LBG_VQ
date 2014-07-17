@@ -8,7 +8,7 @@ addpath('../common');
 
 VEC_LEN = 13;
 
-orig_data = get_data_vector_from_file('../../test.dat', VEC_LEN);
+orig_data = get_data_vector_from_file('../../base.dat', VEC_LEN);
 learn_data = get_data_vector_from_file('../../base.dat', VEC_LEN);
 
 %DBG!!!!
@@ -18,7 +18,6 @@ VEC_NUM = length(orig_data(:,1));
 
 cb_lens = [4 8 16 32 64 128 256 512 1024];
 epsilon = 0.05;
-i_mean = 1;
 
 %% actual calculations
 
@@ -45,7 +44,7 @@ M = (1 - epsilon);
 
 for k = 1: length(cb_lens)
     cur_cb_len = cb_lens(k);
-    decoded = get_decoded_data_vector_from_file('../../lbg_vq_cpp/Release', 'decoded', 'dec', cur_cb_len, epsilon, VEC_LEN);
+    decoded = get_decoded_data_vector_from_file('../../lbg_vq_cpp/Release', 'dbg_decoded', 'dec', cur_cb_len, epsilon, VEC_LEN);
     
     %DBG!!!!
 %     decoded = [decoded; decoded; decoded; decoded];
@@ -58,7 +57,7 @@ for k = 1: length(cb_lens)
     mean_dists(k) = mean(dists);
     max_dists(k) = max(dists);
     
-    K = M^(log2(cb_lens(k)) * i_mean);
+    K = M^log2(cb_lens(k));
     ref_mean(k) = V * K;
     ref_max(k) = 3 * ref_mean(k);
 end
@@ -67,24 +66,18 @@ end
 
 figure;
 hold on;
+
+stem( log2(cb_lens), max_dists, 'r*');
+plot( log2(cb_lens), ref_max, '--r');
+legend();
+xlabel('log2(code book length)');
+ylabel('max norm');
+
 stem( log2(cb_lens), mean_dists, 'g*');
 plot( log2(cb_lens), ref_mean, '--g');
-legend('Error mean norm', 'D(size)');
-xlabel('log2(size)');
-ylabel('estimated values');
-str = sprintf('Epsilon = %1.2f, i_mean = %1.2f', epsilon, i_mean);
-title(str);
-
-figure;
-hold on;
-stem( log2(cb_lens), max_dists, 'r*');
-plot( log2(cb_lens), mean_dists, 'g');
-legend();
-xlabel('log2(size)');
-ylabel('estimated values');
-legend('Error max norm', 'Error mean norm');
-str = sprintf('Epsilon = %1.2f, i_mean = %1.2f', epsilon, i_mean);
-title(str);
+legend('Max norms', 'Reference estim max', 'Mean norms', 'Reference estim mean');
+xlabel('log2(code book length)');
+ylabel('mean norm');
 
 %% cleanup ...
 rmpath('../common');

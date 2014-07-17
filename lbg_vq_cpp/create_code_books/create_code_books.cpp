@@ -5,7 +5,7 @@
 
 #include "lbg_file_utils.h"
 
-#define EPSILON 0.01f
+#define EPSILON 0.1f
 #define MAX_BOOK_SIZE 1024
 
 int _tmain(int argc, _TCHAR* argv[])

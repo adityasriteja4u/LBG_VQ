@@ -38,14 +38,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	char encoded_file_name[256];
 	char decoded_file_name[256];
 
-	std::vector< data_vector > dataset = DataSetConstructor::DataSetFromFloatFile<vec_len> ("../../test.dat");
+	//std::vector< data_vector > dataset = DataSetConstructor::DataSetFromFloatFile<vec_len> ("../../test.dat");
+	std::vector< data_vector > dataset = DataSetConstructor::DataSetFromFloatFile<vec_len> ("../../base.dat");
 
 	while (cur_book_size < MAX_BOOK_SIZE) {
 		cur_book_size <<=1;
 
 		sprintf_s(book_file_name, 256, "lbg_codebook_sz_%d_eps_%1.2f.lbg", cur_book_size, EPSILON);
-		sprintf_s(encoded_file_name, 256, "encoded_codebook_sz_%d_eps_%1.2f.cod", cur_book_size, EPSILON);
-		sprintf_s(decoded_file_name, 256, "decoded_codebook_sz_%d_eps_%1.2f.dec", cur_book_size, EPSILON);
+		sprintf_s(encoded_file_name, 256, "dbg_encoded_codebook_sz_%d_eps_%1.2f.cod", cur_book_size, EPSILON);
+		sprintf_s(decoded_file_name, 256, "dbg_decoded_codebook_sz_%d_eps_%1.2f.dec", cur_book_size, EPSILON);
 
 		printf(" Working with book: %s ...\n", book_file_name);
 		printf(" Encoding data to: %s ...\n", encoded_file_name);
