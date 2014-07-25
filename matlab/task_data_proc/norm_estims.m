@@ -18,7 +18,7 @@ VEC_NUM = length(orig_data(:,1));
 
 cb_lens = [4 8 16 32 64 128 256 512 1024];
 epsilon = 0.05;
-i_mean = 1;
+i_mean = 1.1;
 
 %% actual calculations
 
